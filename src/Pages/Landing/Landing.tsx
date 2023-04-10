@@ -69,6 +69,10 @@ export const Landing = () => {
             description:
                 "Treat yourself to a delicious and luxurious chocolate experience that you won't forget.",
         },
+        {
+            title: "Cum on your Face",
+            description: " Not "
+        }
     ];
 
     useEffect(() => {
