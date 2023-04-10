@@ -51,7 +51,8 @@ interface SlideProps {
 export const Landing = () => {
     const classes = useStyles();
     const [currentSlide, setCurrentSlide] = useState(0);
-    const slideRef = useRef<HTMLDivElement>(null);
+    // Creates a reference to our div element
+    const slideRef = useRef<HTMLDivElement>();
     console.log(slideRef, currentSlide)
     const slides: SlideProps[] = [
         {
@@ -78,15 +79,20 @@ export const Landing = () => {
     useEffect(() => {
         const handleScroll = (event: WheelEvent) => {
             const delta = Math.sign(event.deltaY);
-            if (delta > 0 && currentSlide < slides.length - 1) {
+            const isGoingUp = delta < 0;
+            const isGoingDown = delta > 0;
+            const isNotLastSlide = currentSlide < slides.length - 1;
+            const isNotFirstSlide = currentSlide > 0;
+
+            if (isGoingDown && isNotLastSlide) {
                 setCurrentSlide(currentSlide + 1);
-            } else if (delta < 0 && currentSlide > 0) {
+            } else if (isGoingUp && isNotFirstSlide) {
                 setCurrentSlide(currentSlide - 1);
             }
         };
         window.addEventListener("wheel", handleScroll);
         return () => window.removeEventListener("wheel", handleScroll);
-    }, [currentSlide, slides.length]);
+    }, [slides]);
 
 
 
@@ -96,12 +102,29 @@ export const Landing = () => {
                 <Box
                     key={index}
                     className={`${classes.slide}${index === currentSlide
-                        ? `${classes[`slide-${index + 1}` as keyof typeof classes]}`
+                        ? ` ${classes[`slide-${index + 1}` as keyof typeof classes]}`
                         : ""
                         }`}
                     ref={slideRef}
                 >
                     <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={6}>
+                            <Box
+                                sx={{
+                                    height: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Typography variant="h1">
+                                    {slide.title}
+                                </Typography>
+                                <Typography>
+                                    {slide.description}
+                                </Typography>
+                            </Box>
+                        </Grid>
                         <Grid item xs={12} sm={6}>
                             <Box
                                 sx={{
