@@ -4,7 +4,7 @@ import { Box, Grid, Theme, Typography } from "@mui/material";
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
-        height: "100vh",
+        height: "90vh",
         overflow: "hidden",
         position: "relative",
         display: "flex",
@@ -26,15 +26,19 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     slideOne: {
         backgroundColor: "#ffbb6a",
-        transform: "translateX(0%)",
+        transform: "translateY(0%)",
     },
     slideTwo: {
         backgroundColor: "#d3a075",
-        transform: "translateX(-100%)",
+        transform: "translateY(-100%)",
     },
     slideThree: {
         backgroundColor: "#f0d1d1",
-        transform: "translateX(-200%)",
+        transform: "translateY(-200%)",
+    },
+    slideFour: {
+        backgroundColor: "#f0d1d4",
+        transform: "translateY(-300%)",
     },
     image: {
         width: "100%",
@@ -44,6 +48,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface SlideProps {
+    id: number;
     title: string;
     description: string;
 }
@@ -53,98 +58,88 @@ export const Landing = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     // Creates a reference to our div element
     const slideRef = useRef<HTMLDivElement>();
-    console.log(slideRef, currentSlide)
+    console.log("CurrentSlideRef", slideRef.current, "CurrentSlide", currentSlide)
+
     const slides: SlideProps[] = [
         {
+            id: 1,
             title: "Simply Chocolate",
             description:
                 "Discover the finest chocolates and chocolate gifts, including chocolate bars, truffles, and more.",
         },
         {
+            id: 2,
             title: "Premium Quality",
             description:
                 "We use only the finest ingredients and traditional techniques to create our exceptional chocolates.",
         },
         {
+            id: 3,
             title: "Indulge Yourself",
             description:
                 "Treat yourself to a delicious and luxurious chocolate experience that you won't forget.",
         },
         {
+            id: 4,
             title: "Cum on your Face",
-            description: " Not "
+            description: " Not dsahkdahfhdsakghkalhdfklghks hfhdsakghkalhdfklgh hfhdsakghkalhdfklgh"
         }
     ];
 
+    const handleScroll = (event: WheelEvent) => {
+        const delta = Math.sign(event.deltaY);
+        const isGoingUp = delta < 0;
+        const isGoingDown = delta > 0;
+        const isNotLastSlide = currentSlide < slides.length - 1;
+        const isNotFirstSlide = currentSlide > 0;
+        if (isGoingDown && isNotLastSlide) {
+            setCurrentSlide(currentSlide + 1);
+        } else if (isGoingUp && isNotFirstSlide) {
+            setCurrentSlide(currentSlide - 1);
+        }
+    };
+
     useEffect(() => {
-        const handleScroll = (event: WheelEvent) => {
-            const delta = Math.sign(event.deltaY);
-            const isGoingUp = delta < 0;
-            const isGoingDown = delta > 0;
-            const isNotLastSlide = currentSlide < slides.length - 1;
-            const isNotFirstSlide = currentSlide > 0;
+        window.addEventListener("wheel", handleScroll, { passive: true });
+    }, [currentSlide]);
 
-            if (isGoingDown && isNotLastSlide) {
-                setCurrentSlide(currentSlide + 1);
-            } else if (isGoingUp && isNotFirstSlide) {
-                setCurrentSlide(currentSlide - 1);
-            }
-        };
-        window.addEventListener("wheel", handleScroll);
-        return () => window.removeEventListener("wheel", handleScroll);
-    }, [slides]);
-
-
-
+    const getSlideClassName = (slideId: number) => {
+        if (slideId === currentSlide) {
+            return classes.slideOne;
+        } else if (slideId === currentSlide + 1) {
+            return classes.slideTwo;
+        } else if (slideId === currentSlide + 2) {
+            return classes.slideThree;
+        } else if (slideId === currentSlide + 3) {
+            return classes.slideFour;
+        } else {
+            return classes.image;
+        }
+    };
     return (
-        <Box className={classes.container}>
-            {slides.map((slide, index) => (
+        <Grid container className={classes.container}>
+            {slides.map((slide) => (
                 <Box
-                    key={index}
-                    className={`${classes.slide}${index === currentSlide
-                        ? ` ${classes[`slide-${index + 1}` as keyof typeof classes]}`
-                        : ""
-                        }`}
+                    key={slide.id}
                     ref={slideRef}
+                    className={`${classes.slide} ${getSlideClassName(slide.id)}`}
                 >
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={6}>
-                            <Box
-                                sx={{
-                                    height: "100%",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Typography variant="h1">
-                                    {slide.title}
-                                </Typography>
-                                <Typography>
-                                    {slide.description}
-                                </Typography>
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <Box
-                                sx={{
-                                    height: "100%",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Typography variant="h1">
-                                    {slide.title}
-                                </Typography>
-                                <Typography>
-                                    {slide.description}
-                                </Typography>
-                            </Box>
-                        </Grid>
+                    <Grid item xs={12} sm={12} sx={{
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        <Typography variant="h1">
+                            {slide.title}
+                        </Typography>
+                        <Typography>
+                            {slide.description}
+                        </Typography>
                     </Grid>
                 </Box>
             ))}
-        </Box>
+        </Grid>
     );
 };
