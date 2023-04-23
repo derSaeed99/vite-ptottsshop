@@ -120,7 +120,7 @@ export const Landing = () => {
         slideRef.current.scrollTo(currentSlide);
     }, [currentSlide]);
 
-    console.log(currentSlide, slides.length - 1)
+
     return (
         <>
             <Grid container className={classes.container} spacing={2}>
