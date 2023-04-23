@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { makeStyles } from "@mui/styles";
-import { Box, Grid, Theme, Typography } from "@mui/material";
+import { Box, Grid, Theme, Typography, IconButton } from "@mui/material";
+import bck1 from "../../Assets/bck1.svg";
+import bck2 from "../../Assets/bck2.svg";
+import bck3 from "../../Assets/bck3.svg";
+import bck4 from "../../Assets/bck4.svg";
+import Leroy from "../../Assets/leroy-jetson.png";
+import KenDog from "../../Assets/ken-dog.png";
+import tnt from "../../Assets/tnt.jpg";
+import LeroyVid from "../../Assets/ptotts.webm";
+import KenDogVideo from "../../Assets/ptotts_1.webm";
+import { AvatarSpring } from "../../Components/AvatarSpring";
+import { VideoSpring } from "../../Components/VideoCardSpring";
+import { ArrowButtonSpring } from "../../Components/ArrowButtonSpring";
+import { IParallax, Parallax, ParallaxLayer } from '@react-spring/parallax';
+import { SlideProps } from "../../model";
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {
@@ -10,145 +24,173 @@ const useStyles = makeStyles((theme: Theme) => ({
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f0f0f0",
+        backgroundColor: '#253237',
     },
     slide: {
-        height: "90vh",
+        height: "100%",
         width: "100%",
         position: "absolute",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        top: 0,
+        left: 0,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center',
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
         transition: "transform 0.5s ease-out",
     },
-    translate1: {
-        transform: "translateY(0%)",
+    deepContentButton: {
+        opacity: "90%",
+        borderRadius: "50%",
+        width: 80,
+        height: 80,
+        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.50)',
+        '&:hover': {
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 1)',
+        },
     },
-    translate2: {
-        transform: "translateY(-100%)",
-    },
-    translate3: {
-        transform: "translateY(-200%)",
-    },
-    translate4: {
-        transform: "translateY(-300%)",
-    },
-    hide: {
-        display: "none",
-    },
-    image: {
-        width: "100%",
-        height: "auto",
-        objectFit: "cover",
-    },
-}));
 
-interface SlideProps {
-    id: number;
-    title: string;
-    description: string;
-    backgroundColor: string;
-}
+}));
 
 export const Landing = () => {
     const classes = useStyles();
-    const [currentSlide, setCurrentSlide] = useState(0);
-    const slideRef = useRef<HTMLDivElement>();
-
+    const [slideDeepContent, setSlideDeepContent] = useState<boolean>(false);
+    const [currentSlide, setCurrentSlide] = useState<number>(0);
+    const slideRef = useRef<IParallax>(null!);
     const slides: SlideProps[] = [
         {
             id: 1,
-            title: "Simply Chocolate",
+            productImg: Leroy,
+            title: "Leroy Jetson",
             description:
-                "Discover the finest chocolates and chocolate gifts, including chocolate bars, truffles, and more.",
-            backgroundColor: "#ffbb6a",
+                "The Time Chuck made-up a new Jetsons character.",
+            backgroundImage: bck1,
+            videoUrl: LeroyVid,
         },
         {
             id: 2,
-            title: "Premium Quality",
+            productImg: KenDog,
+            title: "Kenny Dog",
             description:
-                "We use only the finest ingredients and traditional techniques to create our exceptional chocolates.",
-            backgroundColor: "#d3a075",
+                "When Kenny was wearing real tight skinny jeans.",
+            backgroundImage: bck3,
+            videoUrl: KenDogVideo
         },
         {
             id: 3,
-            title: "Indulge Yourself",
+            productImg: KenDog,
+            title: "Kenny Dog",
             description:
-                "Treat yourself to a delicious and luxurious chocolate experience that you won't forget.",
-            backgroundColor: "#f0d1d1",
-        },
-        {
-            id: 4,
-            title: "Cum on your Face",
-            description:
-                "Not dsahkdahfhdsakghkalhdfklghks hfhdsakghkalhdfklgh hfhdsakghkalhdfklgh",
-            backgroundColor: "#f0d1d4",
+                "When Kenny was wearing real tight skinny jeans.",
+            backgroundImage: bck3,
+            videoUrl: KenDogVideo
         },
     ];
 
-    const handleScroll = (event: WheelEvent) => {
-        const delta = Math.sign(event.deltaY);
+    const scrollOnClick = (event: React.BaseSyntheticEvent) => {
+        currentSlide === (slides.length - 1) ?
+            (
+                slideRef.current.scrollTo(0),
+                setCurrentSlide(0)
+            ) : (
+                slideRef.current.scrollTo(currentSlide + 1),
+                setCurrentSlide(currentSlide + 1)
+            )
+    }
+
+    const handleScroll = (offset: number) => {
+        const delta = Math.sign(offset);
         const isGoingUp = delta < 0;
         const isGoingDown = delta > 0;
         const isNotLastSlide = currentSlide < slides.length - 1;
         const isNotFirstSlide = currentSlide > 0;
         if (isGoingDown && isNotLastSlide) {
+            setSlideDeepContent(false)
             setCurrentSlide(currentSlide + 1);
         } else if (isGoingUp && isNotFirstSlide) {
+            setSlideDeepContent(false)
             setCurrentSlide(currentSlide - 1);
         }
     };
+
     useEffect(() => {
-        window.addEventListener("wheel", handleScroll);
-        return () => {
-            window.removeEventListener("wheel", handleScroll);
-        };
+        slideRef.current.scrollTo(currentSlide);
     }, [currentSlide]);
 
-    const getSlideClassName = (slideId: number) => {
-        const delta = slideId - currentSlide;
-        if (delta === 0) {
-            return `${classes.slide}`;
-        } else if (delta > 0 && delta <= 3) {
-            return `${classes.slide} ${classes["translate" + delta as keyof typeof classes]}`;
-        } else if (delta < 0 && delta >= -3) {
-            return `${classes.slide} ${classes["translate" + (-1 * delta) as keyof typeof classes]}`;
-        } else {
-            return `${classes.slide} ${classes.hide}`;
-        }
-    };
-    console.log(slideRef)
+    console.log(currentSlide, slides.length - 1)
     return (
-        <Grid container className={classes.container}>
-            {slides.map((slide) => (
-                <Box
-                    key={slide.id}
-                    ref={slideRef}
-                    className={getSlideClassName(slide.id)}
-                    style={{
-                        backgroundColor: slide.backgroundColor,
-                        width: "100%"
-                    }}
-                >
-                    <Grid item xs={12} sm={12}
-                        sx={{
-                            height: "90vh",
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            alignItems: "center",
-                        }}>
-                        <Typography variant="h1">
-                            {slide.title}
-                        </Typography>
-                        <Typography>
-                            {slide.description}
-                        </Typography>
-                    </Grid>
-                </Box>
-            ))}
-        </Grid>
+        <>
+            <Grid container className={classes.container} spacing={2}>
+                <Parallax pages={slides.length} ref={slideRef} onWheelCapture={(event) => {
+                    handleScroll(event.deltaY)
+                }}>
+                    {slides.map((slide) => (
+                        <ParallaxLayer
+                            offset={slide.id - 1}
+                            speed={0.01}
+                            key={slide.id}
+                            className={classes.slide}
+                            style={{ backgroundImage: `url(${slide.backgroundImage})` }}>
+                            <ParallaxLayer speed={-0.05} className={classes.slide}
+                                onClick={scrollOnClick}  >
+                                <Grid item xs={12} sm={12} sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-evenly',
+                                    width: "80%"
+                                }}>
+                                    <Grid item sm={4}>
+                                        <AvatarSpring
+                                            condition={slideDeepContent}
+                                            alt={slide.title}
+                                            src={slide.productImg}
+                                        />
+                                    </Grid>
+                                    {slideDeepContent ? (
+                                        <Grid item sm={8} >
+                                            <VideoSpring
+                                                condition={slideDeepContent}
+                                                src={slide.videoUrl}
+                                                poster={tnt}
+                                            />
+                                        </Grid>
+                                    ) : (
+                                        <Grid item sm={4} >
+                                            <Typography align="center" variant="h1" color="white">
+                                                {slide.title}
+                                            </Typography>
+                                        </Grid>
+                                    )}
+                                    <Grid item sm={2}>
+                                        <IconButton onClick={(e) => {
+                                            e.stopPropagation(),
+                                                setSlideDeepContent(!slideDeepContent)
+                                        }}>
+                                            <ArrowButtonSpring condition={slideDeepContent} />
+                                        </IconButton>
+                                    </Grid>
+                                    <Grid item>
+                                        {slideDeepContent &&
+                                            (
+                                                <>
+                                                    <Typography variant="h2" color="white">
+                                                        {slide.title}
+                                                    </Typography>
+                                                    <Typography color="white">
+                                                        {slide.description}
+                                                    </Typography>
+                                                </>
+                                            )}
+                                    </Grid>
+                                </Grid>
+                            </ParallaxLayer >
+                        </ParallaxLayer >
+                    ))}
+                </Parallax >
+            </Grid >
+        </>
     );
 };
