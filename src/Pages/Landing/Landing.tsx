@@ -1,103 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
-import { makeStyles } from "@mui/styles";
-import { Box, Grid, Theme, Typography, IconButton } from "@mui/material";
-import bck1 from "../../Assets/bck1.svg";
-import bck2 from "../../Assets/bck2.svg";
-import bck3 from "../../Assets/bck3.svg";
-import bck4 from "../../Assets/bck4.svg";
-import Leroy from "../../Assets/leroy-jetson.png";
-import KenDog from "../../Assets/ken-dog.png";
+import { Grid, Typography, IconButton } from "@mui/material";
 import tnt from "../../Assets/tnt.jpg";
-import LeroyVid from "../../Assets/ptotts.webm";
-import KenDogVideo from "../../Assets/ptotts_1.webm";
 import { AvatarSpring } from "../../Components/AvatarSpring";
 import { VideoSpring } from "../../Components/VideoCardSpring";
 import { ArrowButtonSpring } from "../../Components/ArrowButtonSpring";
 import { IParallax, Parallax, ParallaxLayer } from '@react-spring/parallax';
 import { SlideProps } from "../../model";
-
-const useStyles = makeStyles((theme: Theme) => ({
-    container: {
-        height: "90vh",
-        overflow: "hidden",
-        position: "relative",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: '#253237',
-    },
-    slide: {
-        height: "100%",
-        width: "100%",
-        position: "absolute",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        top: 0,
-        left: 0,
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center center',
-        backgroundAttachment: 'fixed',
-        backgroundSize: 'cover',
-        transition: "transform 0.5s ease-out",
-    },
-    deepContentButton: {
-        opacity: "90%",
-        borderRadius: "50%",
-        width: 80,
-        height: 80,
-        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.50)',
-        '&:hover': {
-            boxShadow: '0px 4px 8px rgba(0, 0, 0, 1)',
-        },
-    },
-
-}));
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import KeyboardDoubleArrowUpOutlinedIcon from '@mui/icons-material/KeyboardDoubleArrowUpOutlined';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import { animated, useSpring, easings } from '@react-spring/web';
 
 export const Landing = () => {
-    const classes = useStyles();
     const [slideDeepContent, setSlideDeepContent] = useState<boolean>(false);
+    const [slides, setSlides] = useState<SlideProps[]>([]);
     const [currentSlide, setCurrentSlide] = useState<number>(0);
     const slideRef = useRef<IParallax>(null!);
-    const slides: SlideProps[] = [
-        {
-            id: 1,
-            productImg: Leroy,
-            title: "Leroy Jetson",
-            description:
-                "The Time Chuck made-up a new Jetsons character.",
-            backgroundImage: bck1,
-            videoUrl: LeroyVid,
-        },
-        {
-            id: 2,
-            productImg: KenDog,
-            title: "Kenny Dog",
-            description:
-                "When Kenny was wearing real tight skinny jeans.",
-            backgroundImage: bck3,
-            videoUrl: KenDogVideo
-        },
-        {
-            id: 3,
-            productImg: KenDog,
-            title: "Kenny Dog",
-            description:
-                "When Kenny was wearing real tight skinny jeans.",
-            backgroundImage: bck3,
-            videoUrl: KenDogVideo
-        },
-    ];
+
+    useEffect(() => {
+        const getProducts = async () => {
+            const querySnapshot = await getDocs(collection(db, "products"));
+            const getProductsArray = querySnapshot.docs.map((doc) => doc.data() as SlideProps)
+            setSlides(getProductsArray)
+            // const storage = await getStorage();
+            // const getUrl = await getDownloadURL(ref(storage, 'bck4.svg'))
+            // console.log(getUrl)
+        }
+        getProducts()
+    }, [])
 
     const scrollOnClick = (event: React.BaseSyntheticEvent) => {
         currentSlide === (slides.length - 1) ?
             (
                 slideRef.current.scrollTo(0),
-                setCurrentSlide(0)
+                setCurrentSlide(0),
+                setSlideDeepContent(false)
             ) : (
                 slideRef.current.scrollTo(currentSlide + 1),
-                setCurrentSlide(currentSlide + 1)
+                setCurrentSlide(currentSlide + 1),
+                setSlideDeepContent(false)
             )
     }
 
@@ -110,86 +53,145 @@ export const Landing = () => {
         if (isGoingDown && isNotLastSlide) {
             setSlideDeepContent(false)
             setCurrentSlide(currentSlide + 1);
+            console.log(currentSlide,
+                slideRef.current.scrollTo(currentSlide + 1)
+            )
         } else if (isGoingUp && isNotFirstSlide) {
             setSlideDeepContent(false)
             setCurrentSlide(currentSlide - 1);
+            slideRef.current.scrollTo(currentSlide - 1)
         }
     };
 
-    useEffect(() => {
-        slideRef.current.scrollTo(currentSlide);
-    }, [currentSlide]);
-
-
+    const props = useSpring({
+        from: {
+            y: "0%",
+            opacity: 0.2,
+        },
+        to: {
+            y: "10%",
+            opacity: 0.5,
+        },
+        config: { duration: 2000, easing: easings.easeOutBounce },
+        loop: true,
+    })
+    const DownArrowAnimated = animated(KeyboardArrowDownOutlinedIcon);
+    const UpArrowAnimated = animated(KeyboardDoubleArrowUpOutlinedIcon);
     return (
         <>
-            <Grid container className={classes.container} spacing={2}>
-                <Parallax pages={slides.length} ref={slideRef} onWheelCapture={(event) => {
-                    handleScroll(event.deltaY)
-                }}>
-                    {slides.map((slide) => (
-                        <ParallaxLayer
-                            offset={slide.id - 1}
-                            speed={0.01}
-                            key={slide.id}
-                            className={classes.slide}
-                            style={{ backgroundImage: `url(${slide.backgroundImage})` }}>
-                            <ParallaxLayer speed={-0.05} className={classes.slide}
-                                onClick={scrollOnClick}  >
-                                <Grid item xs={12} sm={12} sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-evenly',
-                                    width: "80%"
+            <Grid container sx={{
+                height: "90vh",
+                overflow: "hidden",
+                position: "relative",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: '#fff',
+            }} spacing={2}>
+                {slides.length &&
+                    <Parallax pages={slides.length} ref={slideRef} onWheelCapture={(event) => {
+                        handleScroll(event.deltaY)
+                    }}>
+                        {slides?.map((slide) => (
+                            <ParallaxLayer
+                                offset={slide.productId - 1}
+                                speed={0.02}
+                                key={slide.productId}
+                                style={{
+                                    backgroundImage: slide.backgroundImg ? `url(${slide.backgroundImg})` : "",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    top: 0,
+                                    left: 0,
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'center center',
+                                    backgroundAttachment: 'fixed',
+                                    backgroundSize: 'cover',
                                 }}>
-                                    <Grid item sm={4}>
-                                        <AvatarSpring
-                                            condition={slideDeepContent}
-                                            alt={slide.title}
-                                            src={slide.productImg}
-                                        />
-                                    </Grid>
-                                    {slideDeepContent ? (
-                                        <Grid item sm={8} >
-                                            <VideoSpring
+                                <ParallaxLayer
+                                    style={{
+                                        width: "100%",
+                                        position: "absolute",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                    }}
+                                    speed={0.04}
+                                    onClick={scrollOnClick}  >
+                                    <Grid item xs={12} sm={12} sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-evenly',
+                                        width: "80%"
+                                    }}>
+                                        <Grid item sm={4}>
+                                            <AvatarSpring
                                                 condition={slideDeepContent}
-                                                src={slide.videoUrl}
-                                                poster={tnt}
+                                                alt={slide.title ? slide.title : ""}
+                                                src={slide.imgUrl ? slide.imgUrl : ""}
                                             />
                                         </Grid>
-                                    ) : (
-                                        <Grid item sm={4} >
-                                            <Typography align="center" variant="h1" color="white">
-                                                {slide.title}
-                                            </Typography>
+                                        {slideDeepContent ? (
+                                            <Grid item sm={8} >
+                                                <VideoSpring
+                                                    condition={slideDeepContent}
+                                                    src={slide.videoUrl ? slide.videoUrl : ""}
+                                                    poster={tnt}
+                                                />
+                                            </Grid>
+                                        ) : (
+                                            <Grid item sm={4} sx={{ textShadow: `5px 5px 5px rgba(0, 0, 0, 0.2)` }} >
+                                                <Typography align="center" variant="h1" color="white">
+                                                    {slide.title}
+                                                </Typography>
+                                            </Grid>
+                                        )}
+                                        <Grid item sm={2}>
+                                            <IconButton
+                                                onClick={(e) => {
+                                                    e.stopPropagation(),
+                                                        setSlideDeepContent(!slideDeepContent)
+                                                }}>
+                                                <ArrowButtonSpring
+
+                                                    condition={slideDeepContent} />
+                                            </IconButton>
                                         </Grid>
+                                        <Grid item>
+                                            {slideDeepContent &&
+                                                (
+                                                    <>
+                                                        <Typography variant="h2" color="white">
+                                                            {slide.title}
+                                                        </Typography>
+                                                        <Typography color="white">
+                                                            {slide.description}
+                                                        </Typography>
+                                                    </>
+                                                )}
+                                        </Grid>
+                                    </Grid>
+                                </ParallaxLayer >
+                                <Grid item md={12} sm={12}
+                                    onClick={scrollOnClick}
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "flex-end",
+                                        justifyContent: "flex-end"
+                                    }}>
+                                    {(slide.productId === (slides.length)) ? (
+                                        <UpArrowAnimated style={{ height: 200, width: 50, color: "white", ...props, }} />
+                                    ) : (
+                                        <DownArrowAnimated style={{ height: 200, width: 50, color: "white", ...props, }} />
                                     )}
-                                    <Grid item sm={2}>
-                                        <IconButton onClick={(e) => {
-                                            e.stopPropagation(),
-                                                setSlideDeepContent(!slideDeepContent)
-                                        }}>
-                                            <ArrowButtonSpring condition={slideDeepContent} />
-                                        </IconButton>
-                                    </Grid>
-                                    <Grid item>
-                                        {slideDeepContent &&
-                                            (
-                                                <>
-                                                    <Typography variant="h2" color="white">
-                                                        {slide.title}
-                                                    </Typography>
-                                                    <Typography color="white">
-                                                        {slide.description}
-                                                    </Typography>
-                                                </>
-                                            )}
-                                    </Grid>
                                 </Grid>
                             </ParallaxLayer >
-                        </ParallaxLayer >
-                    ))}
-                </Parallax >
+                        ))}
+                    </Parallax >
+                }
             </Grid >
         </>
     );

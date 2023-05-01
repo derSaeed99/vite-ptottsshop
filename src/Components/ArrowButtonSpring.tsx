@@ -9,9 +9,9 @@ interface SpringCondition {
 
 export const ArrowButtonSpring = ({ condition }: SpringCondition) => {
   const spring = useSpring({
-    from: { rotateZ: condition ? 180 : 0 },
-    to: { rotateZ: condition ? 0 : 180 },
-    config: { duration: 50, easing: easings.easeOutBounce },
+    from: { rotateZ: condition ? 180 : 0, config: { duration: 50 } },
+    to: { rotateZ: condition ? 0 : 180, config: { duration: 50 } },
+    config: { duration: 500, easing: easings.easeOutBounce },
   })
   const AnimatedArrowButton = animated(ArrowBackIosNewOutlinedIcon);
   return (

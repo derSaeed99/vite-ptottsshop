@@ -1,8 +1,8 @@
 export interface SlideProps {
-    id: number;
-    productImg: string;
+    productId: number;
+    imgUrl: string;
     title: string;
     description: string;
-    backgroundImage?: string;
+    backgroundImg?: string;
     videoUrl: string;
 }

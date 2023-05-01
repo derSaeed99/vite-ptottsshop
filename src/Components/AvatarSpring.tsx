@@ -13,9 +13,9 @@ interface SpringCondition extends AvatarProps {
 
 export const AvatarSpring = ({ condition, src, alt }: SpringCondition) => {
   const spring = useSpring({
-    to: { x: condition ? 0 : 100 },
-    from: { x: condition ? 100 : 0 },
-    config: { duration: 50, easing: easings.easeOutBounce },
+    to: { x: condition ? 0 : 100, config: { duration: 10, easing: easings.linear(4) } },
+    from: { x: condition ? 100 : 0, config: { duration: 10, easing: easings.linear } },
+    config: { duration: 1000, easing: easings.easeOutBounce },
   })
   const AnimatedAvatar = animated(Avatar);
   return (

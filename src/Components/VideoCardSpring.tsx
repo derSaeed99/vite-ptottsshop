@@ -14,9 +14,9 @@ interface SpringCondition extends VideoCard {
 export const VideoSpring = ({ condition, src, poster }: SpringCondition) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const spring = useSpring({
-    to: { width: condition ? "100%" : "0%", height: condition ? "100%" : "0%" },
-    from: { width: condition ? "0%" : "100%", height: condition ? "0%" : "100%" },
-    config: { duration: 50, easing: easings.easeInOutBounce, clamp: true },
+    to: { width: condition ? "100%" : "0%", margin: "auto", height: condition ? "100%" : "0%", opacity: 1, },
+    from: { width: condition ? "0%" : "100%", margin: "auto", height: condition ? "0%" : "100%", opacity: 0, },
+    config: { duration: 500, easing: easings.easeOutBounce },
   })
 
   const AnimatedPaper = animated(Paper);
