@@ -11,13 +11,6 @@
         "source": "**",
         "destination": "/index.html"
       }
-    ],
-    "source" : "/sw.js",
-        "headers" : [
-          {
-            "key" : "Cache-Control",
-            "value" : "no-store"
-          }
-        ]
+    ]
   }
 }
