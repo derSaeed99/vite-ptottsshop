@@ -79,15 +79,18 @@ export const Landing = () => {
     const UpArrowAnimated = animated(KeyboardDoubleArrowUpOutlinedIcon);
     return (
         <>
-            <Grid container sx={{
-                height: "90vh",
-                overflow: "hidden",
-                position: "relative",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: '#fff',
-            }} spacing={2}>
+            <Grid container
+                sx={{
+                    height: "90vh",
+                    overflow: "hidden",
+                    position: "relative",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: '#fff',
+                }}
+                spacing={2}
+            >
                 {slides.length &&
                     <Parallax pages={slides.length} ref={slideRef} onWheelCapture={(event) => {
                         handleScroll(event.deltaY)
