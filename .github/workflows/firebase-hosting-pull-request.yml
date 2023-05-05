@@ -5,10 +5,7 @@ name: Deploy to Firebase Hosting on PR
 'on': pull_request
 env:
   CI: false
-  REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-  REACT_APP_STRIPE_API_KEY: ${{ secrets.REACT_APP_STRIPE_API_KEY }}
-  REACT_APP_STAGING_BASE_URL: ${{ secrets.REACT_APP_STAGING_BASE_URL }}
-  REACT_APP_ADMIN_EMAIL: ${{ secrets.REACT_APP_ADMIN_EMAIL }}
+  REACT_APP_FIREBASE_API_KEY: `${{FIREBASE_SERVICE_ACCOUNT_PTOTTS_SHOP}}´
 jobs:
   build_and_preview:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
