@@ -30,7 +30,6 @@ export const Landing = () => {
         }
         getProducts()
     }, [])
-
     const scrollOnClick = (event: React.BaseSyntheticEvent) => {
         currentSlide === (slides.length - 1) ?
             (
@@ -61,8 +60,7 @@ export const Landing = () => {
             setCurrentSlide(currentSlide - 1);
             slideRef.current.scrollTo(currentSlide - 1)
         }
-    };
-
+    }
     const props = useSpring({
         from: {
             y: "0%",
